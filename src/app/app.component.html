@@ -10,40 +10,67 @@
 </head>
 <body>
 
-
-
-
 <div class="container-fluid">
-  <h1>Sales Taxes Problem</h1>
 
-  <div class="row">
-
-    <div class="col-sm-4">
-      <input type="string" id="input" (keyup.enter)="onEnteringInput(inputString)" [(ngModel)]="inputString">
-      <button type="submit" (click)="onEnteringInput(inputString)">Button</button>
-      <div>
-        <table>
-        <tr *ngFor = "let row of shoppingList">
-          {{row.quantity}} {{row.product}} {{row.cost}}
-        </tr>
-      </table>
-      </div>
-
-    </div>
-<button (click)="checkoutButton(shoppingList)"></button>
-    <div class="col-sm-4">
-     <table>
-       <tr *ngFor = "let row of receipt">
-         {{row}}
-       </tr>
-     </table>
-    </div>
-
+  <div style="text-align: center">
+    <h1 class="headerStyle">Sales Taxes Problem</h1>
   </div>
 
+  <div class="row">
+    <mat-card style="background: lightgrey">
+      <div>
+        <button mat-raised-button (click)="clearAllButton()">Clear All</button>
+      </div>
+    </mat-card>
+  </div>
+
+  <div class="row cartStyle">
+    <div class="col-sm-6">
+      <div class="row rowHeight">
+        <div class="col-sm-8">
+          <mat-form-field appearance="fill">
+            <mat-label>Type Product Here</mat-label>
+            <input matInput type="string" id="input" (keyup.enter)="onEnteringInput(inputString)"
+                   [(ngModel)]="inputString">
+          </mat-form-field>
+        </div>
+        <div class="col-sm-4">
+          <button mat-raised-button (click)="onEnteringInput(inputString)">Add To Cart</button>
+        </div>
+      </div>
+
+      <mat-card class="cartStyle">
+        <mat-card-title>Shopping Cart</mat-card-title>
+        <table>
+          <tr *ngFor="let row of shoppingList">
+            {{row.quantity}} {{row.product}} {{row.cost}}
+          </tr>
+        </table>
+      </mat-card>
+    </div>
+
+    <div class="col-sm-6">
+      <div class="row rowHeight">
+        <div class="col-sm-8">
+        </div>
+        <div class="col-sm-4">
+          <div>
+            <button mat-raised-button (click)="checkoutButton(shoppingList)">Checkout</button>
+          </div>
+        </div>
+      </div>
+
+      <mat-card class="cartStyle">
+        <mat-card-title>Receipt</mat-card-title>
+        <table>
+          <tr *ngFor="let row of receipt">
+            {{row}}
+          </tr>
+        </table>
+      </mat-card>
+    </div>
+  </div>
 </div>
-
-
 
 </body>
 </html>

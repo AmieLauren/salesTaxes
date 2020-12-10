@@ -9,8 +9,6 @@ import * as _ from 'lodash';
 })
 
 export class AppComponent {
-  title = 'salesTaxes';
-  // the entered input
   inputString: string;
   shoppingList: StoreItem[] = [];
   checkoutList: StoreItem[] = [];
@@ -102,6 +100,13 @@ export class AppComponent {
     return Math.round(productTaxTotal * 20) / 20;
   }
 
+  clearAllButton(): void{
+    this.shoppingList = [];
+    this.checkoutList = [];
+    this.receipt = [];
+    this.salesTaxes = 0;
+    this.cartTotal = 0;
+  }
 
 
 
