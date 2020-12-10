@@ -29,18 +29,14 @@ export class AppComponent {
       product: splitInputUp.join(' '),
       cost: Number(splitListForCost[1]),
     };
-    console.log('new product', newProduct);
     this.shoppingList.push(newProduct);
-    console.log('the shopping list', this.shoppingList);
   }
   checkoutButton(shoppingList: StoreItem[]): void {
     // groups items by product
     const uniqueItems = _.uniq(shoppingList.map(s => s.product));
-    console.log('unique items', uniqueItems);
     // gets all unique products to sort by
     for (const name of uniqueItems) {
       const items = shoppingList.filter(x => x.product === name);
-      console.log('sorted shopping list', items);
       this.calculateUniqueProduct(items);
     }
     // loops and pushed final cart details to receipt that will be displayed
@@ -101,6 +97,7 @@ export class AppComponent {
   }
 
   clearAllButton(): void{
+    this.inputString = '';
     this.shoppingList = [];
     this.checkoutList = [];
     this.receipt = [];

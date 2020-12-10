@@ -43,7 +43,7 @@
         <mat-card-title>Shopping Cart</mat-card-title>
         <table>
           <tr *ngFor="let row of shoppingList">
-            {{row.quantity}} {{row.product}} {{row.cost}}
+            {{row.quantity}} {{row.product}} at {{row.cost.toFixed(2)}}
           </tr>
         </table>
       </mat-card>
