@@ -11,17 +11,15 @@ import * as _ from 'lodash';
 export class AppComponent {
   title = 'salesTaxes';
   // the entered input
-  testerString: string;
-  // to hold the shopping list items
+  inputString: string;
   shoppingList: StoreItem[] = [];
   checkoutList: StoreItem[] = [];
   receipt: string[] = [];
-  salesTaxes: number;
-  cartTotal: number;
+  salesTaxes = 0;
+  cartTotal = 0;
 
   onEnteringInput(inputString: string): void {
     // split on ' at ' and space to get the needed variables for shoppingList
-
     const splitInputUp = inputString.split(' ');
     splitInputUp.shift();
     splitInputUp.splice(-2, 2);
@@ -47,21 +45,19 @@ export class AppComponent {
       console.log('sorted shopping list', items);
       this.calculateUniqueProduct(items);
     }
+    // loops and pushed final cart details to receipt that will be displayed
     for (const product of this.checkoutList) {
       this.salesTaxes += product.salesTax;
       this.cartTotal += product.cost;
       if (product.quantity === 1) {
-        this.receipt.push(`${product.product}: ${product.cost}`);
+        this.receipt.push(`${product.product}: ${product.cost.toFixed(2)}`);
       }
       if (product.quantity > 1) {
-        this.receipt.push(`${product.product}: ${product.cost} (${product.quantity} @ ${product.originalCost})`);
+        this.receipt.push(`${product.product}: ${product.cost.toFixed(2)} (${product.quantity} @ ${product.originalCost})`);
       }
     }
-    console.log('sales tax:', this.salesTaxes, 'total amount', this.cartTotal);
-    this.receipt.push(`Sales Taxes: ${this.salesTaxes} `);
-    this.receipt.push(`Total: ${this.cartTotal}`);
-    console.log('THE FINAL RECEIPT', this.receipt);
-    // takes the shopping list and calculates the tax based on the product type
+    this.receipt.push(`Sales Taxes: ${this.salesTaxes.toFixed(2)} `);
+    this.receipt.push(`Total: ${this.cartTotal.toFixed(2)}`);
   }
   calculateUniqueProduct(productList: StoreItem[]): void {
     // adds unique product info totals and adds to checkoutList
@@ -69,36 +65,43 @@ export class AppComponent {
     let productCost = 0;
     let originalCost = 0;
     let salesTax = 0;
+    let productTax = 0;
     let product;
     for (const item of productList) {
       productCost += item.cost;
       originalCost = item.cost;
-      // salesTax += salesTax;
+      salesTax += salesTax;
       productCount += item.quantity;
       product = item.product;
       // if import tax applies (5%)
       if (product.includes('Imported')){
-        salesTax += (productCost * 0.05);
-        productCost = productCost + (productCost * 0.05);
+        productTax = this.calculateSalesTax(productCost, 0.05);
+        salesTax += productTax;
+        productCost = productCost + productTax;
       }
       // if sales tax applies, add to total (10%)
       if (!(product.includes('Book') || product.includes('Chocolate') || product.includes('pills') )){
-        salesTax += (productCost * 0.1);
-        productCost = productCost + (productCost * 0.1);
+        productTax = this.calculateSalesTax(productCost, 0.1);
+        salesTax += productTax;
+        productCost = productCost + productTax;
       }
     }
-    // console.log('checkout list', this.checkoutList);
     this.checkoutList.push(
       {
         quantity: Number(productCount),
         product: product.toString(),
         cost: Number(productCost),
-        originalCost: Number(originalCost)
+        originalCost: Number(originalCost),
+        salesTax: Number(salesTax)
       }
     );
-    console.log('The checkoutList', this.checkoutList);
-
   }
+  calculateSalesTax(productCost: number, taxPercent: number): number {
+    // Rounds tax up to nearest 5 cents
+    const productTaxTotal = productCost * taxPercent;
+    return Math.round(productTaxTotal * 20) / 20;
+  }
+
 
 
 
