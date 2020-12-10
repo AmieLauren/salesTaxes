@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import {StoreItem} from '../models/StoreItem';
 import * as _ from 'lodash';
+import {isNumeric} from 'rxjs/internal-compatibility';
 
 @Component({
   selector: 'app-root',
@@ -19,19 +20,29 @@ export class AppComponent {
   onEnteringInput(inputString: string): void {
     // split on ' at ' and space to get the needed variables for shoppingList
     const splitInputUp = inputString.split(' ');
-    splitInputUp.shift();
-    splitInputUp.splice(-2, 2);
-    const getQuantity = inputString.split(' ', 2);
-    const splitListForCost = inputString.split(' at ', 2);
-    // putting into StoreItem
-    const newProduct: StoreItem = {
-      quantity: Number(getQuantity[0]),
-      product: splitInputUp.join(' '),
-      cost: Number(splitListForCost[1]),
-    };
-    this.shoppingList.push(newProduct);
+    if ( inputString.includes(' at ') && isNumeric(splitInputUp[0])) {
+      splitInputUp.shift();
+      splitInputUp.splice(-2, 2);
+      const getQuantity = inputString.split(' ', 2);
+      const splitListForCost = inputString.split(' at ', 2);
+      // putting into StoreItem
+      const newProduct: StoreItem = {
+        quantity: Number(getQuantity[0]),
+        product: splitInputUp.join(' '),
+        cost: Number(splitListForCost[1]),
+      };
+      this.shoppingList.push(newProduct);
+    }
+    else {
+      this.openErrorAlert();
+    }
   }
   checkoutButton(shoppingList: StoreItem[]): void {
+    // clearing values so that you can click checkout multiple times and just add from cart rather than clearing everything
+    this.receipt = [];
+    this.checkoutList = [];
+    this.salesTaxes = 0;
+    this.cartTotal = 0;
     // groups items by product
     const uniqueItems = _.uniq(shoppingList.map(s => s.product));
     // gets all unique products to sort by
@@ -105,6 +116,7 @@ export class AppComponent {
     this.cartTotal = 0;
   }
 
-
-
+  openErrorAlert(): void {
+    alert('Not valid input; Correct format is: AMOUNT PRODUCTNAME at COST');
+  }
 }
