@@ -16,6 +16,8 @@ export class AppComponent {
   receipt: string[] = [];
   salesTaxes = 0;
   cartTotal = 0;
+  salesTax = .10;
+  importTax = .05;
 
   onEnteringInput(inputString: string): void {
     // split on ' at ' and space to get the needed variables for shoppingList
@@ -58,7 +60,7 @@ export class AppComponent {
         this.receipt.push(`${product.product}: ${product.cost.toFixed(2)}`);
       }
       if (product.quantity > 1) {
-        this.receipt.push(`${product.product}: ${product.cost.toFixed(2)} (${product.quantity} @ ${product.originalCost})`);
+        this.receipt.push(`${product.product}: ${product.cost.toFixed(2)} (${product.quantity} @ ${product.originalCost.toFixed(2)})`);
       }
     }
     this.receipt.push(`Sales Taxes: ${this.salesTaxes.toFixed(2)} `);
@@ -66,38 +68,31 @@ export class AppComponent {
   }
   calculateUniqueProduct(productList: StoreItem[]): void {
     // adds unique product info totals and adds to checkoutList
-    let productCount = 0;
-    let productCost = 0;
-    let originalCost = 0;
-    let salesTax = 0;
-    let productTax = 0;
-    let product;
+    let totalProductCount = 0;
+    let totalProductCost = 0;
+    let totalProductTax = 0;
+    const productName = productList[0].product;
+    const originalCost = productList[0].cost;
     for (const item of productList) {
-      productCost += item.cost;
-      originalCost = item.cost;
-      salesTax += salesTax;
-      productCount += item.quantity;
-      product = item.product;
-      // if import tax applies (5%)
-      if (product.includes('Imported')){
-        productTax = this.calculateSalesTax(productCost, 0.05);
-        salesTax += productTax;
-        productCost = productCost + productTax;
-      }
-      // if sales tax applies, add to total (10%)
-      if (!(product.includes('Book') || product.includes('Chocolate') || product.includes('pills') )){
-        productTax = this.calculateSalesTax(productCost, 0.1);
-        salesTax += productTax;
-        productCost = productCost + productTax;
-      }
+      totalProductCost += item.cost;
+      totalProductCount += item.quantity;
+    }
+    if (productName.includes('Imported')){
+      totalProductTax = this.calculateSalesTax(totalProductCost, this.importTax);
+      totalProductCost = totalProductCost + totalProductTax;
+    }
+    // if sales tax applies, add to total (10%)
+    if (!(productName.includes('Book') || productName.includes('Chocolate') || productName.includes('pills') )){
+      totalProductTax = this.calculateSalesTax(totalProductCost, this.salesTax);
+      totalProductCost = totalProductCost + totalProductTax;
     }
     this.checkoutList.push(
       {
-        quantity: Number(productCount),
-        product: product.toString(),
-        cost: Number(productCost),
+        quantity: Number(totalProductCount),
+        product: productName,
+        cost: Number(totalProductCost),
         originalCost: Number(originalCost),
-        salesTax: Number(salesTax)
+        salesTax: Number(totalProductTax)
       }
     );
   }
