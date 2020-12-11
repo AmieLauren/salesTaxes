@@ -71,35 +71,41 @@ export class AppComponent {
     let totalProductCount = 0;
     let totalProductCost = 0;
     let totalProductTax = 0;
+    let totalProductImportTax = 0;
     const productName = productList[0].product;
     const originalCost = productList[0].cost;
+    let itemCost = 0;
+    let totalTax = 0;
     for (const item of productList) {
-      totalProductCost += item.cost;
+      itemCost = item.cost;
+      totalProductTax = 0;
+      totalProductImportTax = 0;
+      if (productName.toLowerCase().includes('imported')){
+        totalProductImportTax = this.calculateSalesTax(itemCost, this.importTax);
+      }
+      // if sales tax applies, add to total (10%)
+      if (!(productName.toLowerCase().includes('book') || productName.toLowerCase().includes('chocolate') ||
+        productName.toLowerCase().includes('pills') || productName.toLowerCase().includes('chocolates'))){
+        totalProductTax = this.calculateSalesTax(itemCost, this.salesTax);
+      }
       totalProductCount += item.quantity;
-    }
-    if (productName.includes('Imported')){
-      totalProductTax = this.calculateSalesTax(totalProductCost, this.importTax);
-      totalProductCost = totalProductCost + totalProductTax;
-    }
-    // if sales tax applies, add to total (10%)
-    if (!(productName.includes('Book') || productName.includes('Chocolate') || productName.includes('pills') )){
-      totalProductTax = this.calculateSalesTax(totalProductCost, this.salesTax);
-      totalProductCost = totalProductCost + totalProductTax;
+      totalTax += totalProductImportTax + totalProductTax;
+      totalProductCost += itemCost + totalProductImportTax + totalProductTax;
     }
     this.checkoutList.push(
       {
         quantity: Number(totalProductCount),
         product: productName,
         cost: Number(totalProductCost),
-        originalCost: Number(originalCost),
-        salesTax: Number(totalProductTax)
+        originalCost: Number(originalCost + totalProductImportTax),
+        salesTax: Number(totalTax)
       }
     );
   }
   calculateSalesTax(productCost: number, taxPercent: number): number {
     // Rounds tax up to nearest 5 cents
     const productTaxTotal = productCost * taxPercent;
-    return Math.round(productTaxTotal * 20) / 20;
+    return Number((Math.ceil(productTaxTotal * 20 - 0.05) / 20).toFixed(2));
   }
 
   clearAllButton(): void{
